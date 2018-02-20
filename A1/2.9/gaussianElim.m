@@ -1,6 +1,5 @@
 function gaussianElim()
 
-A = ones(2,2);
 xExact = ones(2,1);
 rNormA = [];
 rNormB = [];
@@ -9,6 +8,7 @@ errNormB = [];
 
 for k = 1 : 10
     eps = 10^(-2*k);
+    A = ones(2,2);
     A(1,1) = eps;
     b = [1+eps; 2];
     x = zeros(2,1);
@@ -25,7 +25,7 @@ for k = 1 : 10
     errNormA = [errNormA, norm(x-xExact, inf)];
     
     % Part B
-    r(2) = (r(2)-r(1))/eps;
+    r(2) = r(2)- r(1)/eps;
     iter = zeros(2,1);
     iter(2) = r(2)/A(2,2);
     iter(1) = (r(1)-A(1,2)*iter(2))/eps;
@@ -38,22 +38,22 @@ end
 
 k = 1 : 10;
 figure
-plot(k, log10(rNormA));
+plot(k, rNormA);
 hold on
-plot(k, log10(errNormA));
+plot(k, errNormA);
 xlabel('K');
 ylabel('Norm');
 title('Part A');
-legend('residual', 'error');
+% legend('residual', 'error');
 
 figure
-plot(k, log10(rNormB));
+plot(k, rNormB);
 hold on
-plot(k, log10(errNormB));
+plot(k, errNormB);
 xlabel('K');
 ylabel('Norm');
 title('Part B');
-legend('residual', 'error');
+% legend('residual', 'error');
 
 end
 
