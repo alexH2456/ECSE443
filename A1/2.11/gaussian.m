@@ -1,8 +1,9 @@
-function x = gaussian(mode, A, b)
+function [x,xAns] = gaussian(mode, A, b)
 
 format long;
 [n,~] = size(A);
 x = zeros(n,1);
+xAns = linsolve(A,b);
 
 switch mode
     
@@ -15,13 +16,8 @@ switch mode
             end
         end
         
-        x(n) = b(n)/A(n,n);
-        
-        for i = n-1:-1:1
-            x(i) = (b(i) - dot(x(i+1:n), A(i, i+1:n)))/A(i,i);
-        end
-        
     case 'partial'
+        % Working but need to refactor code
         for i = 1 : n
             [~, maxNum] = max(abs(A(i:n,i)));
             maxNum = maxNum + i - 1;
@@ -44,7 +40,18 @@ switch mode
         end
         
     case 'full'
-        
+        % NOT WORKING
+        for k = 1:n-1
+            [maxc, rowidx] = max(abs(A(k:n, k:n)));
+            [maxm, colidx] = max(maxc);
+            row = rowidx(colidx) + k - 1;
+            col  = colidx + k - 1;
+            A([k,row],:) = A([row,k],:);
+            A(:,[k,col]) = A(:,[col,k]);
+            if A(k,k) == 0
+                break
+            end
+        end
 end
 
 x(n) = b(n)/A(n,n);

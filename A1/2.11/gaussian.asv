@@ -1,7 +1,9 @@
-function x = gaussian(mode, A, b)
+function [x,xAns] = gaussian(mode, A, b)
 
+format long;
 [n,~] = size(A);
 x = zeros(n,1);
+xAns = zeros(n,1);
 
 switch mode
     
@@ -12,12 +14,6 @@ switch mode
                 A(j, i+1 : n) = A(j, i+1 : n) - A(i, i+1 : n)*A(j,i)/p;
                 b(j) = b(j) - b(i)*A(j,i)/p;
             end
-        end
-        
-        x(n) = b(n)/A(n,n);
-        
-        for i = n-1:-1:1
-            x(i) = (b(i) - dot(x(i+1:n), A(i, i+1:n)))/A(i,i);
         end
         
     case 'partial'
@@ -36,10 +32,24 @@ switch mode
                 b(maxNum) = tempB;
             end
             
-            for j
+            for j = i+1 : n
+                A(j, i+1 : n) = A(j, i+1 : n) - A(i, i+1 : n)*A(j,i)/p;
+                b(j) = b(j) - b(i)*A(j,i)/p;
+            end
+        end
         
     case 'full'
-        
+        for k = 1:n-1
+            [maxc, rowidx] = max(abs(A(k:n, k:n)));
+            [maxm, colidx] = max(maxc);
+            row = rowidx(colidx) + k - 1;
+            col  = colidx + k - 1;
+            A([k,row],:) = A([row,k],:);
+            A(:,[k,col]) = A(:,[col,k]);
+            if A(k,k) == 0
+                break
+            end
+        end
 end
 
 x(n) = b(n)/A(n,n);
@@ -47,6 +57,6 @@ for i = n-1:-1:1
     x(i) = (b(i) - dot(x(i+1:n), A(i, i+1:n)))/A(i,i);
 end
 
-r = b-A*x;
+xAns = linsolve(A,b);
 
 end
