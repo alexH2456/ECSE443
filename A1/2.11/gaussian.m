@@ -40,16 +40,38 @@ switch mode
         end
         
     case 'full'
-        % NOT WORKING
-        for k = 1:n-1
-            [maxc, rowidx] = max(abs(A(k:n, k:n)));
-            [maxm, colidx] = max(maxc);
-            row = rowidx(colidx) + k - 1;
-            col  = colidx + k - 1;
-            A([k,row],:) = A([row,k],:);
-            A(:,[k,col]) = A(:,[col,k]);
-            if A(k,k) == 0
-                break
+        % Refactor
+        idx = 1:n;
+        for i = 1:n
+            [maxA, maxNum] = max(A(i:n, i:n));
+            [~, maxPiv] = max(maxA);
+            maxK = maxNum(maxPiv)+i-1;
+            maxPiv = maxPiv+i-1;
+            p = A(maxK,maxPiv);
+            
+            if i ~= maxK
+                temp = A(i,:);
+                A(i,:) = A(maxK,:);
+                A(maxK,:) = temp;
+                
+                tempB = b(i);
+                b(i) = b(maxK);
+                b(maxK) = tempB;
+            end
+            
+            if i ~= maxPiv
+                temp = A(:,i);
+                A(:,i) = A(:,maxPiv);
+                A(:,maxPiv) = temp;
+                
+                tempB = idx(i);
+                idx(i) = idx(maxPiv);
+                idx(maxPiv) = tempB;
+            end
+            
+            for j = i+1:n
+                A(j,i+1:n) = A(j,i+1:n) - A(i,i+1:n)*A(j,i)/p;
+                b(j) = b(j) - b(i)*A(j,i)/p;
             end
         end
 end
